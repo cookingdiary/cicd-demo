@@ -20,13 +20,18 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Install and Build 🔧
-        run: |
-          npm install
-          npm run build # 执行你的 webpack --mode production
+      - name: Install Dependencies 📦
+        run: npm install
+
+      - name: Run Tests 🧪
+        run: npm run test # 重点：先安检！
+
+      - name: Build 🔧
+        run: npm run build
 
       - name: Deploy 🚀
+        if: success() # 只有前面的步骤都成功了才执行
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist # 你的 Webpack 打包输出目录
-          branch: gh-pages # 自动化部署的目标分支
+          folder: dist
+          branch: gh-pages
