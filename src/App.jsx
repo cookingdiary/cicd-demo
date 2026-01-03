@@ -1,5 +1,4 @@
 // src/App.jsx
-import React from "react";
 
 function App() {
   // 注意：Webpack 需要配合 DefinePlugin 才能读取 process.env
