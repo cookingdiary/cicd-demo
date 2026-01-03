@@ -2,10 +2,11 @@ name: Build and Deploy React App
 
 on:
   push:
-    branches: [master] # 监听 main 分支的推送
+    branches: [master]
 
 permissions:
-  contents: write # 必须赋予权限，否则机器人没法帮你创建发布分支
+  contents: write
+  packages: write # 新增：允许机器人上传 Docker 镜像到 GitHub Packages
 
 jobs:
   build-and-deploy:
@@ -24,20 +25,43 @@ jobs:
         run: npm install
 
       - name: Code Linting ✨
-        run: npm run lint # 新增：先检查代码整洁度
+        run: npm run lint
 
       - name: Run Tests 🧪
         run: npm run test
 
-      - name: Run Tests 🧪
-        run: npm run test # 重点：先安检！
-
       - name: Build 🔧
         run: npm run build
+        env:
+          MY_API_KEY: ${{ secrets.MY_API_KEY }}
 
-      - name: Deploy 🚀
-        if: success() # 只有前面的步骤都成功了才执行
+      - name: Deploy to GitHub Pages 🚀
+        if: success()
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: dist
           branch: gh-pages
+
+  # ================= 新增：Docker 镜像构建任务 =================
+  build-docker-image:
+    needs: build-and-deploy # 只有测试和网页部署成功了，才打镜像
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry 🔑
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image 🚀
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # 镜像名字格式：ghcr.io/用户名/仓库名:latest
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest

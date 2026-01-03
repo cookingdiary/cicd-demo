@@ -1,0 +1,6 @@
+services:
+  web:
+    build: . # 告诉它直接用当前目录的 Dockerfile 打包
+    ports:
+      - "8081:3000" # 把本地 8081 映射到容器 3000
+    restart: always # 如果电脑重启，容器也跟着自动启动
