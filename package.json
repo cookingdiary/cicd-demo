@@ -5,7 +5,8 @@
   "scripts": {
     "start": "webpack serve --open",
     "build": "webpack --mode production",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "eslint src/**/*.{js,jsx}"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +21,8 @@
     "@babel/preset-env": "^7.28.5",
     "@babel/preset-react": "^7.28.5",
     "babel-loader": "^10.0.0",
+    "eslint": "^9.39.2",
+    "eslint-plugin-react": "^7.37.5",
     "html-webpack-plugin": "^5.6.5",
     "vitest": "^4.0.16",
     "webpack": "^5.104.1",

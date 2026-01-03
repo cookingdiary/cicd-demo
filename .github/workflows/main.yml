@@ -2,7 +2,7 @@ name: Build and Deploy React App
 
 on:
   push:
-    branches: [ master ] # 监听 main 分支的推送
+    branches: [master] # 监听 main 分支的推送
 
 permissions:
   contents: write # 必须赋予权限，否则机器人没法帮你创建发布分支
@@ -18,10 +18,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install Dependencies 📦
         run: npm install
+
+      - name: Code Linting ✨
+        run: npm run lint # 新增：先检查代码整洁度
+
+      - name: Run Tests 🧪
+        run: npm run test
 
       - name: Run Tests 🧪
         run: npm run test # 重点：先安检！

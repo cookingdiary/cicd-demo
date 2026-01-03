@@ -2,6 +2,7 @@
 import React from "react";
 
 const App = () => {
+  const num = 123;
   return (
     <div>
       <h1>Hello Webpack + React!</h1>
