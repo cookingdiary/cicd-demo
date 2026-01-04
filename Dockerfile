@@ -1,22 +1,16 @@
-# 1. 声明基础环境：我们需要一个带有 Node.js 的 Linux 系统
-FROM node:20-alpine
-
-# 2. 创建工作目录：就像在虚拟机里执行 mkdir /app
+# --- 第一阶段：构建 (在云端完成) ---
+FROM node:20-alpine AS builder
 WORKDIR /app
-
-# 3. 把 package.json 复制进去，先装依赖
 COPY package*.json ./
+# 只有 package.json 变动时才会重新安装依赖，利用缓存提速
 RUN npm install
-
-# 4. 把剩下的源码全拷进去
 COPY . .
-
-# 5. 执行打包（这就是你在 CI 里跑过的命令）
 RUN npm run build
 
-# 6. 我们需要一个轻量级的服务器来运行打包后的网页
-RUN npm install -g serve
-EXPOSE 3000
-
-# 7. 容器启动时执行的命令
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# --- 第二阶段：运行 (这是你最后拉取到本地的部分，极小且极快) ---
+FROM nginx:stable-alpine
+# 从 builder 阶段拷贝打包好的静态文件到 Nginx 默认目录
+COPY --from=builder /app/dist /usr/share/nginx/html
+# 暴露 Nginx 默认端口
+EXPOSE 80
+# Nginx 镜像自带启动命令，这里可以省略 CMD
